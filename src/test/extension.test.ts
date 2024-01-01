@@ -10,6 +10,7 @@ import {
 } from '../extension';
 
 suite('Extension Test Suite', () => {
+	// TODO: split this test into multiple single purpose tests
 	test('completions with document filters', async function () {
 		// list files under specific folder
 		const files = await vscode.workspace.fs.readDirectory(vscode.Uri.file(path.join(__dirname, '../../src/test')));
