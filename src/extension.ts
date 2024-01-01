@@ -11,7 +11,7 @@ import {
 
 // TODO: 这个正则表达式能匹配 w12, w12p, w12.5p，w.5p，但不能匹配 w12.5 和 w.5
 // 把 浮点数的点换成 #，就全部都能匹配了
-export const matchRegexp = /\s+(-?w|h|p[xytrbl]?|top|right|bottom|left|gap|gap-x|gap-y)(\d+|#\d+|\d+#\d+)(p|r)$/i;
+export const matchRegexp = /\s+(-?w|h|p[xytrbl]?|text|top|right|bottom|left|gap|gap-x|gap-y)(\d+|#\d+|\d+#\d+)(p|r)$/i;
 
 export const completeClassName = (match: RegExpMatchArray) => {
 	const cssAttr = match[1];
