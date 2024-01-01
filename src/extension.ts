@@ -9,7 +9,10 @@ import {
 	SnippetString,
 } from 'vscode';
 
+// TODO: 这个正则表达式能匹配 w12, w12p, w12.5p，w.5p，但不能匹配 w12.5 和 w.5
+// 把 浮点数的点换成 #，就全部都能匹配了
 export const matchRegexp = /\s+(-?w|h|p[xytrbl]?|top|right|bottom|left|gap|gap-x|gap-y)(\d+|#\d+|\d+#\d+)(p|r)$/i;
+
 export const completeClassName = (match: RegExpMatchArray) => {
 	const cssAttr = match[1];
 	const num = match[2].replaceAll('#', '.');
@@ -34,9 +37,6 @@ export function activate(context: vscode.ExtensionContext) {
 		},
 		{
 			provideCompletionItems(doc, pos) {
-				// TODO: 这个正则表达式能匹配 w12, w12p, w12.5p，w.5p，但不能匹配 w12.5 和 w.5
-				// 把 浮点数的点换成 #，就全部都能匹配了
-
 				let lineUntilPos = doc.getText(new Range(new Position(pos.line, 0), pos));
 				let match = lineUntilPos.match(matchRegexp);
 
@@ -44,13 +44,14 @@ export function activate(context: vscode.ExtensionContext) {
 					const snippetCompletion = new CompletionItem(
 						// IntelliSense 列表中显示的文本
 						completeClassName(match),
-						// // 代码补全后光标所在的位置
+						// 代码补全后光标所在的位置
 						CompletionItemKind.Snippet,
 					);
 
 					// TODO: w12.4p 会自动补完成 w12w-[12.4px]，w.7p 会自动补完成 ww-[.7px]
 					// 猜测和小数点有关，也和前面正则表达式的匹配有关，. 换成 # 就没问题了
-					snippetCompletion.insertText = new SnippetString(completeClassName(match)); // 代码补全后的文本
+					// 代码补全后的文本
+					snippetCompletion.insertText = new SnippetString(completeClassName(match));
 
 					return [snippetCompletion];
 				}
