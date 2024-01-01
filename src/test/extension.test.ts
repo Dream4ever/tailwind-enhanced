@@ -4,6 +4,7 @@ import path from 'path';
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
 import * as vscode from 'vscode';
+
 import {
 	matchRegexp,
 	completeClassName,
@@ -11,6 +12,17 @@ import {
 
 suite('Extension Test Suite', () => {
 	// TODO: split this test into multiple single purpose tests
+	const relativeFolderPath = '../../src/test';
+	const testFileName = 'test.vue';
+	const testFileUri = vscode.Uri.file(path.join(__dirname, relativeFolderPath, testFileName));
+	
+	// test if testFileUri exists
+	test('testFileUri exists', async () => {
+		const files = await vscode.workspace.fs.readDirectory(vscode.Uri.file(path.join(__dirname, relativeFolderPath)));
+		const file = files.find(f => f[0] === testFileName);
+		assert.ok(file, `${testFileName} not found under ${relativeFolderPath} folder`);
+	});
+	
 	test('completions with document filters', async function () {
 		// list files under specific folder
 		const files = await vscode.workspace.fs.readDirectory(vscode.Uri.file(path.join(__dirname, '../../src/test')));
