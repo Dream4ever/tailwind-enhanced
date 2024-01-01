@@ -34,7 +34,6 @@ suite('Extension Test Suite', () => {
 		assert.ok(text, 'No text in line 1');
 		assert.strictEqual(text, '  <div class="w-full h-full "></div>', 'Text in line 1 not match');
 
-
 		// go to line 1, column 28 and input test string
 		const line = 1;
 		const position = new vscode.Position(line, 28);
