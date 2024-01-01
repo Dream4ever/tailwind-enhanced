@@ -15,6 +15,9 @@ suite('Extension Test Suite', () => {
 	const relativeFolderPath = '../../src/test';
 	const testFileName = 'test.vue';
 	const testFileUri = vscode.Uri.file(path.join(__dirname, relativeFolderPath, testFileName));
+
+	let editor: vscode.TextEditor | undefined;
+	let targetLine: vscode.TextLine | undefined;
 	
 	// test if testFileUri exists
 	test('testFileUri exists', async () => {
@@ -22,39 +25,37 @@ suite('Extension Test Suite', () => {
 		const file = files.find(f => f[0] === testFileName);
 		assert.ok(file, `${testFileName} not found under ${relativeFolderPath} folder`);
 	});
-	
-	test('completions with document filters', async function () {
-		// list files under specific folder
-		const files = await vscode.workspace.fs.readDirectory(vscode.Uri.file(path.join(__dirname, '../../src/test')));
 
-		// check if file test.vue exists
-		const file = files.find(f => f[0] === 'test.vue');
-		assert.ok(file, 'test.vue not found under /src/test folder');
-
-		// open file test.vue under path ../../src/test relative to this test file
-		const uri = vscode.Uri.file(path.join(__dirname, '../../src/test/test.vue'));
-		await vscode.workspace.openTextDocument(uri);
+	test('can open test file', async () => {
+		await vscode.workspace.openTextDocument(testFileUri);
 		// focus on editor
-		await vscode.window.showTextDocument(uri);
+		await vscode.window.showTextDocument(testFileUri);
 
-		// get text in line 1
-		const editor = vscode.window.activeTextEditor;
+		editor = vscode.window.activeTextEditor;
 		assert.ok(editor, 'No active editor');
-		const targetLine = editor!.document.lineAt(1);
+	});
+
+	test('test case file has 2 lines', async () => {
+		targetLine = editor!.document.lineAt(1);
 		assert.ok(targetLine, 'No line at position 1');
-		const text = targetLine.text;
+	});
+	
+	test('test case file includes specific string', async () => {
+		const text = targetLine!.text;
 		assert.ok(text, 'No text in line 1');
 		assert.strictEqual(text, '  <div class="w-full h-full "></div>', 'Text in line 1 not match');
-
+	});
+	
+	test('completions with document filters', async function () {
 		// go to line 1, column 28 and input test string
 		const line = 1;
 		const position = new vscode.Position(line, 28);
-		editor.selection = new vscode.Selection(position, position);
+		editor!.selection = new vscode.Selection(position, position);
 		const inputText = 'w12p';
 		await vscode.commands.executeCommand('type', { text: inputText });
 
 		// get text from line column 0 to the end of above input text
-		const lineUntilPos = editor.document.getText(new vscode.Range(new vscode.Position(line, 0), new vscode.Position(line, position.character + inputText.length)));
+		const lineUntilPos = editor!.document.getText(new vscode.Range(new vscode.Position(line, 0), new vscode.Position(line, position.character + inputText.length)));
 
 		let ran = false;
 		const documentSelector = {
@@ -70,12 +71,9 @@ suite('Extension Test Suite', () => {
 			}
 		});
 
-		const result = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', uri, new vscode.Position(1, 0));
+		const result = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', testFileUri, new vscode.Position(1, 0));
 		r1.dispose();
 		assert.ok(ran, 'Provider has not been invoked');
 		assert.ok(result!.items.some(i => i.label === completedClassName), `CompletionItem ${completedClassName} not found`);
-
-		// sleep 20 seconds
-		await new Promise(resolve => setTimeout(resolve, 2000));
 	});
 });
