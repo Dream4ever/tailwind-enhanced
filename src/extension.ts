@@ -23,6 +23,8 @@ export const completeClassName = (match: RegExpMatchArray) => {
 	return `${cssAttr}-[${num}${fullUnit}]`;
 };
 
+// TODO: 参考官方扩展，通过检查 CONFIG_GLOB 和 PACKAGE_LOCK_GLOB 相关的文件，来判断是否需要启用插件
+
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
